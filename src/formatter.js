@@ -5,10 +5,9 @@ module.exports = {formatHeader, formatBody};
 
 function formatHeader (obj) {
   const collection = collections.find((collection) => collection.validate(obj));
-  return ['span', {}, collection.name].concat(
-    (obj.size > MAX_SIZE) ?
-      collection.renderInlinePartial(obj) : collection.renderInlineFull(obj)
-  );
+  return (obj.size > MAX_SIZE) ?
+    collection.renderInlinePartial(collection.name, obj) :
+    collection.renderInlineFull(collection.name, obj);
 }
 
 function formatBody (obj) {
@@ -82,51 +81,61 @@ const collections = [
   }
 ];
 
-function renderInlineFullList (list) {
-  return [['span', {}, '[']].concat(
+function renderInlineFullList (name, list) {
+  return ['span', {class: 'object-value-array source-code'},
+    `${name}`,
+    '['
+  ].concat(
     list.reduce((output, value, index) => {
       output.push(['object', {object: value}]);
-      output.push(['span', {}, ',']);
+      output.push(',');
       return output;
     }, [])
     .slice(0, -1)
   )
-  .concat([['span', {}, ']']]);
+  .concat(']');
 }
 
-function renderInlineFullMap (map) {
-  return [['span', {}, '{']].concat(
-    map.reduce((output, value, key) => {
-      output.push(['span', {},
-        ['span', {}, `${key}:`],
-        ['object', {object: value}]
-      ]);
-      output.push(['span', {}, ',']);
-      return output;
-    }, [])
-    .slice(0, -1)
-  )
-  .concat([['span', {}, '}']]);
+function renderInlineFullMap (name, map) {
+  return ['span', {class: 'object-value-object source-code'},
+    ['span', {class: 'console-object-preview'},
+      `${name}`,
+      '{',
+    ].concat(
+      map.reduce((output, value, key) => {
+        output.push(['span', {class: 'name'}, `${key}`])
+        output.push(': ');
+        output.push(['object', {object: value}]);
+        output.push(', ');
+        return output;
+      }, [])
+      .slice(0, -1)
+    )
+    .concat('}')
+  ];
 }
 
-function renderInlinePartialList (list) {
-  return [['span', {}, `[${list.size}]`]];
+function renderInlinePartialList (name, list) {
+  return ['span', {class: 'object-value-array source-code'},
+    ['span', {}, `${name}[${list.size}]`]
+  ];
 }
 
-function renderInlinePartialMap (map) {
-  return renderInlineFullMap(map)
-    .slice(0, (MAX_SIZE - 1) * 2)
-    .concat([['span', {}, '...'], ['span', {}, '}']]);
+function renderInlinePartialMap (name, map) {
+  return ['span', {class: 'object-value-object source-code'},
+    renderInlineFullMap(name, map)[2]
+      .slice(0, 4 + (MAX_SIZE * 4 - 1))
+      .concat([['span', {}, '...'], '}'])
+  ]
 }
 
 function renderFullBody (obj) {
   return obj.reduce((output, value, key) => {
     output.push(['li', {},
-      ['span', {},
-        ['span', {}, `${key}:`],
-        ['object', {object: value}]
-      ]
+      ['span', {class: 'name'}, `${key}`],
+      ['span', {class: 'object-properties-section-separator'}, ':'],
+      ['object', {object: value}]
     ]);
     return output;
-  }, ['ol', {}]);
+  }, ['ol', {class: 'tree-outline source-code object-properties-section'}]);
 }
