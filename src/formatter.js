@@ -82,13 +82,12 @@ const collections = [
 ];
 
 function renderInlineFullList (name, list) {
-  return ['span', {class: 'object-value-array source-code'},
-    `${name}`,
-    '['
+  return ['span', {style: 'white-space:normal;word-wrap:break-word;'},
+    `${name} [`,
   ].concat(
     list.reduce((output, value, index) => {
       output.push(['object', {object: value}]);
-      output.push(',');
+      output.push(', ');
       return output;
     }, [])
     .slice(0, -1)
@@ -97,45 +96,40 @@ function renderInlineFullList (name, list) {
 }
 
 function renderInlineFullMap (name, map) {
-  return ['span', {class: 'object-value-object source-code'},
-    ['span', {class: 'console-object-preview'},
-      `${name}`,
-      '{',
-    ].concat(
-      map.reduce((output, value, key) => {
-        output.push(['span', {class: 'name'}, `${key}`])
-        output.push(': ');
-        output.push(['object', {object: value}]);
-        output.push(', ');
-        return output;
-      }, [])
-      .slice(0, -1)
-    )
-    .concat('}')
-  ];
+  return ['span', {style: 'font-style:italic;white-space:normal;word-wrap:break-word;'},
+    `${name} {`,
+  ].concat(
+    map.reduce((output, value, key) => {
+      output.push(['span', {style: 'color:rgb(136, 19, 145);flex-shrink:0;'}, `${key}`])
+      output.push(': ');
+      output.push(['object', {object: value}]);
+      output.push(', ');
+      return output;
+    }, [])
+    .slice(0, -1)
+  )
+  .concat('}');
 }
 
 function renderInlinePartialList (name, list) {
-  return ['span', {class: 'object-value-array source-code'},
+  return ['span', {style: 'white-space:normal;word-wrap:break-word;'},
     ['span', {}, `${name}[${list.size}]`]
   ];
 }
 
 function renderInlinePartialMap (name, map) {
-  return ['span', {class: 'object-value-object source-code'},
-    renderInlineFullMap(name, map)[2]
-      .slice(0, 4 + (MAX_SIZE * 4 - 1))
-      .concat([['span', {}, '...'], '}'])
-  ]
+  return renderInlineFullMap(name, map)
+    .slice(0, 4 + (MAX_SIZE * 4 - 2))
+    .concat([['span', {}, '…'], '}']);
 }
 
 function renderFullBody (obj) {
   return obj.reduce((output, value, key) => {
-    output.push(['li', {},
-      ['span', {class: 'name'}, `${key}`],
-      ['span', {class: 'object-properties-section-separator'}, ':'],
+    output.push(['li', {style: 'text-overflow:ellipsis;white-space:nowrap;overflow:hidden;padding-top:2px;position:relative;min-height:inherit;line-height:12px;-webkit-user-select:text;'},
+      ['span', {style: 'color:rgb(136, 19, 145);flex-shrink:0;'}, `${key}`],
+      ['span', {style: 'flex-shrink:0;'}, ': '],
       ['object', {object: value}]
     ]);
     return output;
-  }, ['ol', {class: 'tree-outline source-code object-properties-section'}]);
+  }, ['ol', {style: 'list-style-type:none;padding-left:12px;margin-top:2px;'}]);
 }
