@@ -12,16 +12,20 @@ function install () {
   window.devtoolsFormatters.push({
 
     header(obj) {
-      if (obj && obj.toJS) return formatters.formatHeader(obj);
-      return null;
+      if (!(obj && obj.toJS)) return;
+
+      if (obj.__IS_NESTED__) return formatters.formatHeaderAsTitle(obj.value);
+      if (obj.size >= 100) return formatters.formatHeaderAsSummary(obj.slice(0, 99));
+
+      return formatters.formatHeaderInFull(obj);
     },
 
     hasBody(obj) {
-      return obj && obj.toJS && obj.size > 100;
+      return obj && obj.toJS && (obj.size >= 100 || obj.__IS_NESTED__);
     },
 
     body(obj) {
-      return formatters.formatBody(obj);
+      return formatters.formatBody(obj.__IS_NESTED__ ? obj.value : obj);
     }
 
   });

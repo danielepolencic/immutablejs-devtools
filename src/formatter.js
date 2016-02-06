@@ -1,13 +1,25 @@
 const Immutable = require('immutable');
-const MAX_SIZE = 100;
 
-module.exports = {formatHeader, formatBody};
+module.exports = {
+  formatHeaderInFull,
+  formatHeaderAsSummary,
+  formatHeaderAsTitle,
+  formatBody
+};
 
-function formatHeader (obj) {
-  const collection = collections.find((collection) => collection.validate(obj));
-  return (obj.size > MAX_SIZE) ?
-    collection.renderInlinePartial(collection.name, obj) :
-    collection.renderInlineFull(collection.name, obj);
+function formatHeaderInFull (obj) {
+  const collection = collections.find((collection) => collection.validate(obj))
+  return collection.renderInlineFull(collection.name, obj);
+}
+
+function formatHeaderAsSummary (obj) {
+  const collection = collections.find((collection) => collection.validate(obj))
+  return collection.renderInlinePartial(collection.name, obj);
+}
+
+function formatHeaderAsTitle (obj) {
+  const collection = collections.find((collection) => collection.validate(obj))
+  return collection.renderTitle(collection.name, obj);
 }
 
 function formatBody (obj) {
@@ -21,7 +33,8 @@ const collections = [
     validate: Immutable.List.isList,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
-    renderInlinePartial: renderInlinePartialList
+    renderInlinePartial: renderTitleList,
+    renderTitle: renderTitleList
   },
 
   {
@@ -37,7 +50,8 @@ const collections = [
     validate: Immutable.OrderedMap.isOrderedMap,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullMap,
-    renderInlinePartial: renderInlinePartialMap
+    renderInlinePartial: renderInlinePartialMap,
+    renderTitle: renderTitleMap
   },
 
   {
@@ -45,7 +59,8 @@ const collections = [
     validate: (obj) => Immutable.Map.isMap(obj),
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullMap,
-    renderInlinePartial: renderInlinePartialMap
+    renderInlinePartial: renderInlinePartialMap,
+    renderTitle: renderTitleMap
   },
 
   {
@@ -53,7 +68,8 @@ const collections = [
     validate: Immutable.OrderedSet.isOrderedSet,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
-    renderInlinePartial: renderInlinePartialList
+    renderInlinePartial: renderTitleList,
+    renderTitle: renderTitleList
   },
 
   {
@@ -61,7 +77,8 @@ const collections = [
     validate: Immutable.Set.isSet,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
-    renderInlinePartial: renderInlinePartialList
+    renderInlinePartial: renderTitleList,
+    renderTitle: renderTitleList
   },
 
   {
@@ -69,7 +86,8 @@ const collections = [
     validate: Immutable.Seq.isSeq,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
-    renderInlinePartial: renderInlinePartialList
+    renderInlinePartial: renderTitleList,
+    renderTitle: renderTitleList
   },
 
   {
@@ -77,16 +95,25 @@ const collections = [
     validate: Immutable.Stack.isStack,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
-    renderInlinePartial: renderInlinePartialList
+    renderInlinePartial: renderTitleList,
+    renderTitle: renderTitleList
   }
 ];
+
+function wrap (obj) {
+  return {toJS: true, __IS_NESTED__: true, value: obj};
+}
+
+function isImmutableJS (obj) {
+  return obj && obj.toJS;
+}
 
 function renderInlineFullList (name, list) {
   return ['span', {style: 'white-space:normal;word-wrap:break-word;'},
     `${name} [`,
   ].concat(
     list.reduce((output, value, index) => {
-      output.push(['object', {object: value}]);
+      output.push(['object', {object: isImmutableJS(value) ? wrap(value) : value}]);
       output.push(', ');
       return output;
     }, [])
@@ -102,7 +129,7 @@ function renderInlineFullMap (name, map) {
     map.reduce((output, value, key) => {
       output.push(['span', {style: 'color:rgb(136, 19, 145);flex-shrink:0;'}, `${key}`])
       output.push(': ');
-      output.push(['object', {object: value}]);
+      output.push(['object', {object: isImmutableJS(value) ? wrap(value) : value}]);
       output.push(', ');
       return output;
     }, [])
@@ -111,15 +138,21 @@ function renderInlineFullMap (name, map) {
   .concat('}');
 }
 
-function renderInlinePartialList (name, list) {
+function renderTitleList (name, list) {
   return ['span', {style: 'white-space:normal;word-wrap:break-word;'},
     ['span', {}, `${name}[${list.size}]`]
   ];
 }
 
+function renderTitleMap (name) {
+  return ['span', {style: 'white-space:normal;word-wrap:break-word;'},
+    ['span', {}, `${name}`]
+  ];
+}
+
 function renderInlinePartialMap (name, map) {
   return renderInlineFullMap(name, map)
-    .slice(0, 4 + (MAX_SIZE * 4 - 2))
+    .slice(0, -1)
     .concat([['span', {}, '…'], '}']);
 }
 
