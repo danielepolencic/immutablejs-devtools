@@ -1,4 +1,4 @@
-# immutable-devtools
+# immutablejs-devtools
 
 If you've ever debugged Immutable.js data structures, you know the output looks
 something unreadable like this:
@@ -13,7 +13,7 @@ the data structure, just like you would expect:
 ## Usage
 
 ```javascript
-require('immutable-devtools').install();
+require('immutablejs-devtools').install();
 ```
 
 ## Rationale
