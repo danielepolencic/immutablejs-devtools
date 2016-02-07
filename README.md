@@ -3,12 +3,12 @@
 If you've ever debugged Immutable.js data structures, you know the output looks
 something unreadable like this:
 
-![Immutable.js without custom formatter](http://i.imgur.com/74jFEnn.png)
+![Immutable.js without custom formatter](http://i.imgur.com/S6yLIWp.png)
 
 Once included in your project, this custom formatter displays the inner value of
 the data structure, just like you would expect:
 
-![Immutable.js with custom formatter](http://i.imgur.com/olbWyqw.png)
+![Immutable.js with custom formatter](http://i.imgur.com/fudoZZS.png)
 
 ## Usage
 
