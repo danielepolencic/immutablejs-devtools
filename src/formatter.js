@@ -9,17 +9,17 @@ module.exports = {
 
 function formatHeaderInFull (obj) {
   const collection = collections.find((collection) => collection.validate(obj))
-  return collection.renderInlineFull(collection.name, obj);
+  return collection.renderInlineFull(collection.name(obj), obj);
 }
 
 function formatHeaderAsSummary (obj) {
   const collection = collections.find((collection) => collection.validate(obj))
-  return collection.renderInlinePartial(collection.name, obj);
+  return collection.renderInlinePartial(collection.name(obj), obj);
 }
 
 function formatHeaderAsTitle (obj) {
   const collection = collections.find((collection) => collection.validate(obj))
-  return collection.renderTitle(collection.name, obj);
+  return collection.renderTitle(collection.name(obj), obj);
 }
 
 function formatBody (obj) {
@@ -29,7 +29,7 @@ function formatBody (obj) {
 
 const collections = [
   {
-    name: 'List',
+    name: () => 'List',
     validate: Immutable.List.isList,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
@@ -38,15 +38,16 @@ const collections = [
   },
 
   {
-    name: 'Record',
-    validate: (record) => false,
-    renderBody: () => {},
-    renderInlineFull: () => {},
-    renderInlinePartial: () => {}
+    name: (record) => record._name || record.constructor.name || 'Record',
+    validate: (record) => record instanceof Immutable.Record,
+    renderBody: renderFullBody,
+    renderInlineFull: renderInlineFullMap,
+    renderInlinePartial: renderTitleMap,
+    renderTitle: renderTitleMap
   },
 
   {
-    name: 'OrderedMap',
+    name: () => 'OrderedMap',
     validate: Immutable.OrderedMap.isOrderedMap,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullMap,
@@ -55,7 +56,7 @@ const collections = [
   },
 
   {
-    name: 'Map',
+    name: () => 'Map',
     validate: (obj) => Immutable.Map.isMap(obj),
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullMap,
@@ -64,7 +65,7 @@ const collections = [
   },
 
   {
-    name: 'OrderedSet',
+    name: () => 'OrderedSet',
     validate: Immutable.OrderedSet.isOrderedSet,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
@@ -73,7 +74,7 @@ const collections = [
   },
 
   {
-    name: 'Set',
+    name: () => 'Set',
     validate: Immutable.Set.isSet,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
@@ -82,7 +83,7 @@ const collections = [
   },
 
   {
-    name: 'Seq',
+    name: () => 'Seq',
     validate: Immutable.Seq.isSeq,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
@@ -91,7 +92,7 @@ const collections = [
   },
 
   {
-    name: 'Stack',
+    name: () => 'Stack',
     validate: Immutable.Stack.isStack,
     renderBody: renderFullBody,
     renderInlineFull: renderInlineFullList,
