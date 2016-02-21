@@ -1,6 +1,6 @@
 {
   "name": "immutablejs-devtools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Chrome DevTools custom formatter for Immutable.js's persistent data structures",
   "main": "index.js",
   "scripts": {
