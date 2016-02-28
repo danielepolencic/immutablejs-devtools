@@ -11,9 +11,16 @@ the data structure, just like you would expect:
 ![Immutable.js with custom formatter](http://i.imgur.com/fudoZZS.png)
 
 ## Usage
+Open the Chrome DevTools settings, scroll down to the Console section and tick "Enable custom formatters".  
 
+Then, if you are editing in commonjs, add the following to your codebase:
 ```javascript
 require('immutablejs-devtools').install();
+```
+Of if you are editing in ES2015, add the following:
+```javascript
+import { install } from 'immutablejs-devtools';
+install();
 ```
 
 ## Rationale
